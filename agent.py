@@ -68,9 +68,6 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
-ROOT = HERE.parent
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
 
 from bootcamp_agent.config import ConfigError, load_settings
 from bootcamp_agent.documents import Document, load_corpus

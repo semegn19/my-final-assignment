@@ -41,7 +41,7 @@ see that failure.
 The fix for rank 1 of [ISSUES.md](ISSUES.md) (session 14).
 
 - model: qwen/qwen3.8-27b
-- commit: 730521d — the same HEAD as Before; the query-expansion fix is in the working tree
+- commit: 668f8ee — the last commit
 - command: the same command as Before: `uv run bootcamp final grade --agent final_assignment/agent.py --name "Semegn Mulugeta"`
 - result: `score: 10/10 (100%) — pass bar 30% — PASSED`, and the same battery now reports **7 of 7 paraphrases reaching their document** (`uv run python final_assignment/debug_paraphrase.py` → `paraphrase checks: ALL PASS`), every refusal guard score unchanged (0.00 / 6.62 / 7.58 / 8.83).
 - regression test: `test_regression_rank_1_of_the_issue_list` in `tests/test_contract.py` — `uv run pytest -k regression` → 1 passed (red before the fix: it cited mcp-overview)
