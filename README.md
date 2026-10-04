@@ -1,15 +1,13 @@
 # my-final-assignment
 
-<!-- write this: one sentence. What it answers, from what, and what it does when
-the sources say nothing. -->
+A research assistant that answers developer questions **only** from the six documents in `data/corpus/`, names the document it used, and refuses — flagged for human review, citing nothing — whenever those sources don't support the question.
 
-<!-- add the CI badge once the repository exists:
-![check](https://github.com/<your-github-username>/my-final-assignment/actions/workflows/check.yml/badge.svg) -->
+![check](https://github.com/semegn19/my-final-assignment/actions/workflows/check.yml/badge.svg)
 
 ## The problem
 
-<!-- write this: who has the problem, and what goes wrong for them today. Two to
-four sentences: minute 1 of your demo, in writing. -->
+Developers debugging with internal docs ask questions in their own words, but grep needs the document's words, and a bare LLM invents confident answers from memory with no way to tell which is which. A paraphrase gets an unearned refusal; a plausible-sounding guess gets an unearned yes. Minute 1 of the demo is exactly that fork: one question gets a grounded, cited answer, one gets an honest "I don't know" — and the trace proves which path was taken.
+
 
 ## Demo
 
@@ -40,10 +38,17 @@ says so in words, and the trace shows no model call was spent. -->
 
 ## Architecture
 
-<!-- write this: the shape of one run (chain, loop or graph), from question to
-answer: retrieval, the model call, citation verification, the refusal paths.
-Name the model calls one question costs. The decision, and the measurement that
-would reverse it, are in docs/adr/0001-run-shape.md. -->
+One question costs **0 or 1 model calls — at most 2**. It's a chain with a
+refusal branch: retrieval scores every chunk against the question first, and a
+best score under the gray floor (3.0) refuses *before* any call is spent.
+Otherwise one model call runs (plus at most one corrective retry if the reply
+isn't valid JSON), its reply is treated as untrusted data — citations verified
+against what retrieval actually returned (fabrication → strip and flag),
+reply-shaped directives in retrieved text flagged, never obeyed — and a
+four-band decision (3.0 / 6.0 / 10.0 floors) answers, quotes the source, or
+refuses. Provider error or timeout is a flagged refusal, never a raised
+exception. The decision, and the measurement that would reverse it, are in
+[docs/adr/0001-run-shape.md](docs/adr/0001-run-shape.md).
 
 See [docs/adr/0001-run-shape.md](docs/adr/0001-run-shape.md).
 
@@ -55,22 +60,25 @@ fake model's.
 
 | What | Command | Model | Result |
 |---|---|---|---|
-| Contract tests | `uv run pytest` | fake | <!-- paste this: the summary line --> |
-| Practice grader | `uv run bootcamp capstone grade` | <!-- write this --> | <!-- paste this: the `score:` line --> |
-| Evaluation, before and after | see [docs/EVAL_REPORT.md](docs/EVAL_REPORT.md) | <!-- write this --> | <!-- paste this: the two pass rates --> |
+| Contract tests | `uv run pytest` | qwen/qwen3.8-27b | <!-- paste this: the summary line --> |
+| Practice grader | `uv run bootcamp capstone grade` | qwen/qwen3.8-27b | <!-- paste this: the `score:` score: 10/10 (100%) — pass bar 30% — PASSED --> |
+| Evaluation, before and after | see [docs/EVAL_REPORT.md](docs/EVAL_REPORT.md) | qwen/qwen3.8-27b | paraphrase battery `2/7 → 7/7` passing, practice score unchanged at 10/10 |
 
 ## The honest limitation
 
-<!-- write this: rank 1 of docs/ISSUES.md in one sentence, and the next step
-you would take. Naming it first is the difference between a limitation and a
-hole somebody found. -->
+Rank 1 of the issue list — lexical retrieval misses paraphrases with zero word
+overlap, so a supported question in fresh words earns a refusal — was fixed
+narrowly by a hand-kept query-expansion map (`_EXPANSION`, 18 keys) that will
+rot as the corpus grows; next step is re-auditing every value's chunk-df with
+`debug_paraphrase.py` on each corpus change, and eventually replacing hand-kept
+keys with a retrieval method that generalizes.
 
 The full ranked list is in [docs/ISSUES.md](docs/ISSUES.md).
 
 ## How to run it
 
 ```bash
-git clone https://github.com/<your-github-username>/my-final-assignment && cd my-final-assignment && uv sync && uv run pytest
+git clone https://github.com/semegn19/my-final-assignment && cd my-final-assignment && uv sync && uv run pytest
 ```
 
 No key needed: without a `.env` it runs on the offline fake model. For a real
@@ -81,23 +89,6 @@ To hand in the final assignment, commit and push, then run
 `uv run bootcamp capstone submit --github <you>`. It runs the practice set
 first, then answers the final questions and opens the pull request.
 `--dry-run` shows the bundle without handing anything in.
-
-## Sources
-
-<!-- optional. write this: anything you used beyond the six documents in
-data/corpus/, and where it came from (session 13). Delete the section if none. -->
-
-## Credits
-
-<!-- optional. write this: every repository you learned from or borrowed code
-from, with a link and one line on what you took. Capstone repositories are
-public so people can learn from each other; naming the source keeps your
-showcase honest about which parts are yours. Delete the section if none. -->
-
-## Rollback
-
-<!-- optional. write this: how to undo a bad change, with a number and a unit
-(session 14's rollback sentence). Delete the section if you have none yet. -->
 
 ---
 

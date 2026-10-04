@@ -3,16 +3,23 @@
 **Filled by:** session 11. The five lines are the ones `ch11-e2` reads, in the
 same words; answer each one after its colon.
 
-STORED: <!-- write this: exactly what a session keeps, e.g. preferences and the last N episodes -->
+STORED: one answer_style preference; the last 5 question summaries (episodes).
 
-WHY: <!-- write this: what each stored thing is used for -->
+WHY: it keeps responses short when asked and preserves recent context for this session.
 
-CORRECTED BY: <!-- write this: how a user fixes or clears what was stored -->
+CORRECTED BY: the learner updating preferences or calling reset(); stale episodes are trimmed automatically.
 
-EXPIRES: <!-- write this: when it is deleted, with a number and a unit, and the cap -->
+EXPIRES: after 5 new episodes, or immediately on reset().
 
-WE REFUSE TO REMEMBER: <!-- write this: what is never stored, whatever the user types (keys, personal data, ...) -->
+WE REFUSE TO REMEMBER: personal data, secrets, credentials, tokens, and anything without a clear owner or expiry.
 
 ## How the code enforces it
 
-<!-- write this: the test in tests/ that proves the cap and the reset. -->
+The designated test is `test_memory_is_capped_reset_and_kept_per_user` in
+`tests/test_contract.py`, which must prove the cap holds at 5 episodes after 7
+questions, that `reset()` leaves neither preferences nor episodes behind, and
+that one user's memory never answers another's. Today it is session 11's
+`skip` placeholder — `YourAgent` holds no session state yet, so the same cap
+and reset are currently verified by the `ch11-e1` probe in session 11's
+notebook (7 questions in → exactly 5 episodes; `reset()` → both collections
+empty). The test body gets written the moment this agent gains memory.

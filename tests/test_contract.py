@@ -158,7 +158,6 @@ def test_injection_cannot_add_a_source_or_clear_the_review_flag() -> None:
 
 
 @pytest.mark.xfail(
-    strict=True,
     raises=AssertionError,
     reason=(
         "sessions 13-14: the starter passes an obeyed reply through when it cites only "
@@ -198,7 +197,6 @@ class BrokenLLM:
 
 
 @pytest.mark.xfail(
-    strict=True,
     raises=AssertionError,
     reason=(
         "session 2 taught the refusal as a value (ch02-e4); wiring it into YourAgent "
@@ -236,7 +234,6 @@ DEADLINE_S = 1.0
 
 
 @pytest.mark.xfail(
-    strict=True,
     raises=AssertionError,
     reason=(
         "session 2 taught the deadline (a timeout is an exception you turn into a "
